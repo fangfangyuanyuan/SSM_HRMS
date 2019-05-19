@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hrms.mapper.DesignMapper">
+    <sql id="table_name">
+        tbl_cdesign
+    </sql>
+    <sql id="select_fields">
+       id , stuyear, term, c_id, t_id, s_id, d_score, a_score, r_score, total
+    </sql>
+
+    <resultMap id="desiResult" type="com.hrms.bean.Design">
+        <id column="id" property="id"></id>
+        <result column="stuyear" property="stuyear"></result>
+        <result column="term" property="term"></result>
+        <result column="c_id" property="c_id"></result>
+        <result column="t_id" property="t_id"></result>
+        <result column="s_id" property="s_id"></result>
+        <result column="d_score" property="d_score"></result>
+        <result column="a_score" property="a_score"></result>
+        <result column="r_score" property="r_score"></result>
+        <result column="total" property="total"></result>
+    </resultMap>
+
+
+    <select id="selectDesiByLimitAndOffset" resultMap="desiResult">
+        SELECT
+        <include refid="select_fields"></include>
+        FROM
+        <include refid="table_name"></include>
+        LIMIT #{offset}, #{limit}
+    </select>
+
+    <update id="updateDesiById" parameterType="com.hrms.bean.Design">
+        UPDATE
+        <include refid="table_name"></include>
+        SET
+        stuyear = #{design.stuyear},
+        term = #{design.term},
+        c_id = #{design.c_id},
+        t_id = #{design.t_id},
+        s_id = #{design.s_id},
+        d_score = #{design.d_score},
+        a_score = #{design.a_score},
+        r_score = #{design.r_score},
+        total = #{design.total}
+        where
+        id = #{design.id}
+    </update>
+
+</mapper>

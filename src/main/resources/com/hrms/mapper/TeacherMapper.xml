@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hrms.mapper.TeacherMapper">
+    <sql id="table_name">teacher</sql>
+    <sql id="select_tea_fields">
+        teaId, teaName, teaMajor, teaDept, teaPass
+    </sql>
+
+    <resultMap id="teaResult" type="com.hrms.bean.Teacher">
+        <id column="teaId" property="teaId"></id>
+        <result column="teaName" property="teaName"></result>
+        <result column="teaMajor" property="teaMajor"></result>
+        <result column="teaDept" property="teaDept"></result>
+        <result column="teaPass" property="teaPass"></result>
+    </resultMap>
+
+    <resultMap id="majorResult" type="com.hrms.bean.Teacher">
+        <result column="teaMajor" property="teaMajor"></result>
+    </resultMap>
+
+    <select id="selectOneByTeaId" parameterType="java.lang.String" resultType="com.hrms.bean.Teacher">
+        SELECT
+        <include refid="select_tea_fields"/>
+        FROM
+        <include refid="table_name"/>
+        WHERE
+        teaId = #{teaId}
+    </select>
+
+    <select id="selectOneByTeaName" parameterType="java.lang.String" resultType="com.hrms.bean.Teacher">
+        SELECT
+        <include refid="select_tea_fields"/>
+        FROM
+        <include refid="table_name"/>
+        WHERE
+        teaName = #{teaName}
+    </select>
+
+    <select id="selectTeasByOffsetAndLimit" resultMap="teaResult">
+        SELECT
+        <include refid="select_tea_fields"/>
+        FROM
+        <include refid="table_name"/>
+        LIMIT #{offset}, #{limit}
+    </select>
+
+    <select id="getTeaMajorList" resultMap="majorResult">
+        SELECT
+          DISTINCT teaMajor
+        FROM
+          <include refid="table_name"/>
+    </select>
+
+    <select id="getTeasByMajor" resultMap="teaResult">
+        SELECT
+        <include refid="select_tea_fields"/>
+        FROM
+        <include refid="table_name"/>
+        WHERE
+        teaMajor = #{teaMajor}
+    </select>
+
+    <update id="updateTeaById" parameterType="com.hrms.bean.Teacher">
+        UPDATE
+        <include refid="table_name"></include>
+        SET
+       teaName = #{teacher.teaName, jdbcType = VARCHAR},
+       teaMajor = #{teacher.teaMajor, jdbcType = VARCHAR},
+       teaDept = #{teacher.teaDept, jdbcType = VARCHAR},
+       teaPass = #{teacher.teaPass, jdbcType = VARCHAR}
+        WHERE
+       teaId = #{teaId}
+    </update>
+</mapper>

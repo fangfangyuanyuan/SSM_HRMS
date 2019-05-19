@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hrms.mapper.CourseMapper">
+    <sql id="table_name">
+        course
+    </sql>
+    <sql id="select_cou_fields">
+        couId, couName, couNature, couCredit, couIntroduce, couDept
+    </sql>
+
+    <resultMap id="couResult" type="com.hrms.bean.Course">
+        <id column="couId" property="couId"></id>
+        <result column="couName" property="couName"></result>
+        <result column="couNature" property="couNature"></result>
+        <result column="couCredit" property="couCredit"></result>
+        <result column="couIntroduce" property="couIntroduce"></result>
+        <result column="couDept" property="couDept"></result>
+    </resultMap>
+
+    <select id="selectCouByCouId" parameterType="String" resultType="com.hrms.bean.Course">
+        SELECT
+        <include refid="select_cou_fields"></include>
+        FROM
+        <include refid="table_name"></include>
+        WHERE
+        couId = #{couId}
+    </select>
+
+    <select id="selectCouByCouName" parameterType="String" resultType="com.hrms.bean.Course">
+        SELECT
+        <include refid="select_cou_fields"></include>
+        FROM
+        <include refid="table_name"></include>
+        WHERE
+        couName = #{couName}
+    </select>
+
+    <select id="selectCouNameByAdmin" resultMap="couResult">
+        SELECT
+        <include refid="select_cou_fields"></include>
+        FROM
+        <include refid="table_name"></include>
+    </select>
+
+    <select id="selectCouByLimitAndOffset" resultMap="couResult">
+        SELECT
+        <include refid="select_cou_fields"></include>
+        FROM
+        <include refid="table_name"></include>
+        LIMIT #{offset}, #{limit}
+    </select>
+
+    <update id="updateCouByCouId"  parameterType="com.hrms.bean.Course">
+        UPDATE
+        <include refid="table_name"></include>
+        SET
+        couName = #{course.couName},
+        couNature = #{course.couNature},
+        couCredit = #{course.couCredit},
+        couIntroduce = #{course.couIntroduce},
+        couDept = #{course.couDept}
+        WHERE
+        couId = #{couId}
+    </update>
+</mapper>

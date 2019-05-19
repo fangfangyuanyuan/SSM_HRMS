@@ -1,0 +1,385 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hrms.mapper.GroupMapper">
+    <sql id="table_name">
+       `group`
+    </sql>
+    <sql id="select_gro_fields">
+        groId, curId, stuId,topId, score1, score2, score3, total
+    </sql>
+    <resultMap id="scoResultByStu" type="com.hrms.bean.Group">
+        <id column="groId" property="groId"></id>
+        <result column="couName" property="couName"></result>
+        <result column="curYear" property="curYear"></result>
+        <result column="teaName" property="teaName"></result>
+        <result column="topName" property="topName"></result>
+        <result column="score1" property="score1"></result>
+        <result column="score2" property="score2"></result>
+        <result column="score3" property="score3"></result>
+        <result column="total" property="total"></result>
+    </resultMap>
+
+    <resultMap id="scoResultByTea" type="com.hrms.bean.Group">
+        <id column="groId" property="groId"></id>
+        <result column="curId" property="curId"></result>
+        <result column="stuId" property="stuId"></result>
+        <result column="topId" property="topId"></result>
+        <result column="couName" property="couName"></result>
+        <result column="curYear" property="curYear"></result>
+        <result column="stuName" property="stuName"></result>
+        <result column="stuMajor" property="stuMajor"></result>
+        <result column="stuClass" property="stuClass"></result>
+        <result column="topName" property="topName"></result>
+        <result column="report" property="report"></result>
+        <result column="teaName" property="teaName"></result>
+        <result column="score1" property="score1"></result>
+        <result column="score2" property="score2"></result>
+        <result column="score3" property="score3"></result>
+        <result column="sco1Count" property="sco1Count"></result>
+        <result column="sco2Count" property="sco2Count"></result>
+        <result column="sco3Count" property="sco3Count"></result>
+        <result column="total" property="total"></result>
+        <result column="rowNo" property="rowNo"></result>
+    </resultMap>
+
+    <resultMap id="OptResultByStu" type="com.hrms.bean.Group">
+        <id column="groId" property="groId"></id>
+        <result column="curId" property="curId"></result>
+        <result column="stuId" property="stuId"></result>
+        <result column="topName" property="topName"></result>
+        <result column="stuName" property="stuName"></result>
+        <result column="stuClass" property="stuClass"></result>
+        <result column="stuMajor" property="stuMajor"></result>
+    </resultMap>
+
+    <resultMap id="scoResultByAdmin" type="com.hrms.bean.Group">
+        <id column="groId" property="groId"></id>
+        <result column="stuId" property="stuId"></result>
+        <result column="couName" property="couName"></result>
+        <result column="curYear" property="curYear"></result>
+        <result column="stuName" property="stuName"></result>
+        <result column="teaName" property="teaName"></result>
+        <result column="score1" property="score1"></result>
+        <result column="score2" property="score2"></result>
+        <result column="score3" property="score3"></result>
+        <result column="total" property="total"></result>
+    </resultMap>
+
+    <resultMap id="majorResultByCur" type="com.hrms.bean.Student">
+        <result column="stuMajor" property="stuMajor"></result>
+    </resultMap>
+
+
+    <select id="countScosByStu"  parameterType="String" resultType="int">
+        SELECT
+        COUNT(*)
+        FROM
+        `group` g left JOIN curriculum c2 ON g.curId = c2.curId
+        WHERE
+        stuId = #{stuId}
+        AND
+        c2.scoStatus = 1
+    </select>
+
+
+    <select id="getScoListByStu" resultMap="scoResultByStu">
+      SELECT
+        groId, couName, curYear, teaName, topName, score1, score2, score3, total
+      FROM
+        `group` g LEFT JOIN curriculum c ON g.curId = c.curId LEFT JOIN topic t ON g.topId = t.topId LEFT JOIN student ON g.stuId = student.stuId LEFT JOIN course c3 ON c.couId = c3.couId LEFT JOIN teacher t2 ON c.teaId = t2.teaId
+      WHERE
+      g.stuId = #{stuId}
+      AND
+      c.scoStatus = 1
+      LIMIT #{offset}, #{limit}
+    </select>
+
+
+    <select id="getOptSucList" resultMap="scoResultByStu">
+        SELECT
+        groId, couName, curYear, teaName, topName,score1,score2,score3, total
+        FROM
+        curriculum c1, course c2, teacher t1,topic t2, `group` g, student s
+        WHERE
+        c1.curId = g.curId
+        AND
+        c1.teaId = t1.teaId
+        AND
+        c1.couId = c2.couId
+        AND
+        g.topId = t2.topId
+        AND
+        g.stuId = s.stuId
+        AND
+        g.stuId =#{stuId}
+    </select>
+
+    <!--不为空：topId != '' || topId IS NOT NULL （topId != null错误）-->
+    <select id="getOptTopCounts"  parameterType="String" resultType="int">
+        SELECT
+        COUNT(*)
+        FROM
+         `group` g left JOIN curriculum c2 ON g.curId = c2.curId
+        WHERE
+        g.curId = #{curId}
+        AND
+        c2.scoStatus = 1
+    </select>
+
+    <!--教师查看选题结果-->
+    <select id="getOptTopListByTea" resultMap="OptResultByStu">
+        SELECT
+        groId,g.curId curId,g.stuId stuId, topName,stuName,stuClass,stuMajor
+        FROM
+        curriculum c1,topic t2, `group` g,student s
+        WHERE
+        c1.curId = g.curId
+        AND
+        g.topId = t2.topId
+        AND
+        g.stuId = s.stuId
+        AND
+        g.curId =#{curId}
+    </select>
+
+    <select id="getOptTopListByCur" resultMap="OptResultByStu">
+        SELECT
+        groId,g.curId curId,g.stuId,topName,stuName,stuClass,stuMajor
+        FROM
+       `group` g LEFT JOIN topic t2 ON   g.topId = t2.topId left JOIN student s on g.stuId = s.stuId LEFT  JOIN  curriculum c1 ON  c1.curId = g.curId
+        WHERE
+        g.curId =#{curId}
+    </select>
+
+    <select id="selGroByCurIdAndStuId"  parameterType="String" resultType="com.hrms.bean.Group">
+        SELECT
+        <include refid="select_gro_fields"></include>
+        FROM
+        <include refid="table_name"></include>
+        WHERE
+        curId = #{curId}
+        AND
+        stuId = #{stuId}
+    </select>
+
+    <!--学生文件命名字段查询-->
+    <select id="getGroByStuAndCur" resultMap="scoResultByStu">
+        SELECT
+        groId, g.curId, g.stuId, g.topId, couName, curYear, teaName, topName,score1,score2,score3, total
+        FROM
+        `group` g LEFT JOIN topic t ON g.topId = t.topId, curriculum c1, course c2, teacher t1, student s
+        WHERE
+        c1.curId = g.curId
+        AND
+        c1.teaId = t1.teaId
+        AND
+        c1.couId = c2.couId
+        AND
+        g.stuId = s.stuId
+        AND
+        g.stuId = #{stuId}
+        AND
+        g.curId = #{curId}
+    </select>
+
+    <select id="selectByGroId" resultType="com.hrms.bean.Group">
+       SELECT
+          groId,curId,q.couId,teaId,stuId,stuName,stuMajor,stuClass,topId,topName,score1,score2,score3,total, scoStart, scoEnd, sco1Count,sco2Count,sco3Count
+          FROM
+        (SELECT
+          g.groId,g.curId,c.couId,c.teaId,s.stuId,s.stuName,s.stuMajor,s.stuClass,g.topId, topName,score1,score2,score3,total, scoStart, scoEnd, sco1Count,sco2Count,sco3Count
+        FROM
+          `group` g left JOIN topic t2  on g.topId = t2.topId LEFT JOIN student s ON g.stuId = s.stuId LEFT JOIN curriculum c ON g.curId = c.curId
+        WHERE
+          g.groId = #{groId})q  LEFT JOIN course c2 on q.couId = c2.couId
+    </select>
+
+    <select id="selectGroById" resultType="com.hrms.bean.Group">
+      SELECT
+       groId,curId,q.couId,teaId,stuId,stuName,stuMajor,stuClass,topName,score1,score2,score3,total, scoStart, scoEnd, sco1Count,sco2Count,sco3Count
+      FROM
+        (SELECT
+          g.groId,g.curId,c.couId,c.teaId,s.stuId,s.stuName,s.stuMajor,s.stuClass,topName,score1,score2,score3,total, scoStart, scoEnd, sco1Count,sco2Count,sco3Count
+        FROM
+          `group` g left JOIN topic t2  on g.topId = t2.topId LEFT JOIN student s ON g.stuId = s.stuId LEFT JOIN curriculum c ON g.curId = c.curId
+        WHERE
+          g.groId = #{groId})q
+      LEFT JOIN course c2 on q.couId = c2.couId
+    </select>
+
+    <!--教师查看学生成绩列表-->
+    <select id="getScoListByTea" resultMap="scoResultByTea">
+    SELECT
+      groId,curId,stuId,stuName,stuMajor,stuClass,couName,topId, topName,teaName,report,score1,score2,score3,sco1Count,sco2Count,sco3Count,total,(@rowNum:=@rowNum+1) as rowNo
+    FROM(
+        (SELECT
+          g.groId,g.curId,c.couId,c.teaId,s.stuId,s.stuName,s.stuMajor,s.stuClass,g.topId,topName,report,score1,score2,score3,sco1Count,sco2Count,sco3Count,total
+        FROM
+          `group` g left JOIN topic t2  on g.topId = t2.topId LEFT JOIN student s ON g.stuId = s.stuId LEFT JOIN curriculum c ON g.curId = c.curId
+        WHERE
+           g.curId = #{curId})
+           q LEFT JOIN course c2 ON q.couId = c2.couId LEFT JOIN teacher t on q.teaId = t.teaId),(select (@rowNum :=0) ) b
+    ORDER BY total DESC
+    </select>
+
+    <select id="getScoListExportByTea" resultMap="scoResultByTea">
+        SELECT
+        groId,curId,stuId,stuName,stuMajor,stuClass,couName, topId,topName,report,teaName,score1,score2,score3,sco1Count,sco2Count,sco3Count,total,(@rowNum:=@rowNum+1) as rowNo
+        FROM(
+        (SELECT
+        g.groId,g.curId,c.couId,c.teaId,s.stuId,s.stuName,s.stuMajor,s.stuClass,g.topId,topName,report,score1,score2,score3,sco1Count,sco2Count,sco3Count,total
+        FROM
+        `group` g left JOIN topic t2  on g.topId = t2.topId LEFT JOIN student s ON g.stuId = s.stuId LEFT JOIN curriculum c ON g.curId = c.curId
+        WHERE
+        g.curId = #{curId})
+        q LEFT JOIN course c2 ON q.couId = c2.couId LEFT JOIN teacher t on q.teaId = t.teaId),(select (@rowNum :=0) ) b
+        ORDER BY total DESC
+    </select>
+
+
+
+
+    <select id="getScoReport" resultMap="scoResultByTea">
+        SELECT
+        groId,curId,stuId,stuName,stuMajor,stuClass,couName,topId,topName,teaName,report,score1,score2,score3,sco1Count,sco2Count,sco3Count,total,(@rowNum:=@rowNum+1) as rowNo
+        FROM(
+        (SELECT
+        g.groId,g.curId,c.couId,c.teaId,s.stuId,s.stuName,s.stuMajor,s.stuClass,g.topId,topName,report,score1,score2,score3,sco1Count,sco2Count,sco3Count,total
+        FROM
+        `group` g left JOIN topic t2  on g.topId = t2.topId LEFT JOIN student s ON g.stuId = s.stuId LEFT JOIN curriculum c ON g.curId = c.curId
+        WHERE
+        g.curId = #{curId} AND total IS NOT NULL)
+        q LEFT JOIN course c2 ON q.couId = c2.couId LEFT JOIN teacher t on q.teaId = t.teaId),(select (@rowNum :=0) ) b
+        ORDER BY total DESC
+
+    </select>
+
+    <!--管理员获得某课程教师下的学生列表-->
+    <select id="getStuGroupByAdmin" resultMap="scoResultByAdmin">
+        SELECT
+        groId, g.stuId, couName, curYear, stuName, teaName, score1, score2, score3, total
+        FROM
+        curriculum c1, course c2, `group` g, student s,teacher t
+        WHERE
+        c1.curId = g.curId
+        AND
+        c1.couId = c2.couId
+        AND
+        g.stuId = s.stuId
+        AND
+        c1.teaId = t.teaId
+        AND
+        g.curId = #{curId}
+        LIMIT #{offset}, #{limit}
+    </select>
+
+    <select id="getStuMajorByCur"  parameterType="String" resultMap="majorResultByCur">
+        SELECT
+        DISTINCT  stuMajor
+        FROM
+        `group` g,student s,curriculum c2
+        WHERE
+        g.stuId = s.stuId
+        AND
+        g.curId = c2.curId
+        AND
+        c2.scoStatus = 1
+        AND
+        curId = #{curId}
+    </select>
+
+    <select id="getScoValuesByCouId"   resultType="com.hrms.bean.Group">
+        SELECT
+            count(*) AS totalPeople,
+            sum(if((total = 0),1,0)) AS absentees,
+            sum(if((total != 0),1,0)) AS actualPeople,
+            max(total) AS maxSco,
+            min(total) AS minSco,
+            avg(total) AS avgTotal,
+            avg(score1) AS avg1,
+            avg(score2) AS avg2,
+            avg(score3) AS avg3,
+            FORMAT(STD(total),2) AS stdTotal,
+            FORMAT(STD(score1),2) AS stdScore1,
+            FORMAT(STD(score2),2) AS stdScore2,
+            FORMAT(STD(score2),2) AS stdScore3,
+            sum(case when total &lt;= 60 then 1 else 0 end) AS weak,
+            sum(case when total>=60 AND total &lt;= 70 then 1 else 0 end) AS general,
+            sum(case when total>=70 AND total &lt;= 90 then 1 else 0 end) AS good,
+            sum(case when total>=90 then 1 else 0 end) AS great
+        FROM
+          `group` LEFT JOIN curriculum c ON `group`.curId = c.curId
+        where
+          couId= #{couId}
+        AND
+          curYear=#{curYear}
+    </select>
+
+
+    <select id="getScoValuesByCurId"   resultType="com.hrms.bean.Group">
+        SELECT
+        count(*) AS totalPeople,
+        sum(if((total = 0),1,0)) AS absentees,
+        sum(if((total != 0),1,0)) AS actualPeople,
+        max(total) AS maxSco,
+        min(total) AS minSco,
+        avg(total) AS avgTotal,
+        avg(score1) AS avg1,
+        avg(score2) AS avg2,
+        avg(score3) AS avg3,
+        FORMAT(STD(total),2) AS stdTotal,
+        FORMAT(STD(score1),2) AS stdScore1,
+        FORMAT(STD(score2),2) AS stdScore2,
+        FORMAT(STD(score2),2) AS stdScore3,
+        sum(case when total &lt;= 60 then 1 else 0 end) AS weak,
+        sum(case when total>=60 AND total &lt;= 70 then 1 else 0 end) AS general,
+        sum(case when total>=70 AND total &lt;= 90 then 1 else 0 end) AS good,
+        sum(case when total>=90 then 1 else 0 end) AS great
+        FROM
+        `group` g LEFT JOIN curriculum c ON g.curId = c.curId
+        where
+         g.curId = #{curId}
+    </select>
+
+
+
+    <select id="selGroByCouIdAndStuIdAndCurYear" resultType="com.hrms.bean.Group">
+        SELECT
+        groId, g.curId, stuId, teaId
+        FROM
+        curriculum c1, `group` g
+        WHERE
+        c1.curId = g.curId
+        AND
+        stuId = #{stuId}
+        AND
+        curYear = #{curYear}
+        AND
+        couId = #{couId}
+    </select>
+
+    <!--更新选题-->
+    <update id="updateTopOfGroup" parameterType="com.hrms.bean.Group">
+        UPDATE
+        <include refid="table_name"></include>
+        SET
+        topId = #{group.topId},
+        report = #{group.report},
+        score1 = #{group.score1},
+        score2 = #{group.score2},
+        score3 = #{group.score3},
+        total = #{group.total}
+        WHERE
+        groId = #{groId}
+    </update>
+
+    <update id="cancelTop" parameterType="String">
+        UPDATE
+        <include refid="table_name"></include>
+        SET
+        topId = null
+        WHERE
+        groId = #{groId}
+    </update>
+</mapper>

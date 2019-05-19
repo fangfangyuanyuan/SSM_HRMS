@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hrms.mapper.StudentMapper">
+    <sql id="table_name">student</sql>
+
+    <sql id="select_stu_fields">
+        stuId, stuName, stuClass, stuMajor, stuDept, stuPass
+    </sql>
+
+    <resultMap id="stuResult" type="com.hrms.bean.Student">
+        <id column="stuId" property="stuId"></id>
+        <result column="stuName" property="stuName"></result>
+        <result column="stuClass" property="stuClass"></result>
+        <result column="stuMajor" property="stuMajor"></result>
+        <result column="stuDept" property="stuDept"></result>
+        <result column="stuPass" property="stuPass"></result>
+        <result column="curId" property="curId"></result>
+    </resultMap>
+
+    <resultMap id="stuResult1" type="com.hrms.bean.Student">
+        <id column="stuId" property="stuId"></id>
+        <result column="stuName" property="stuName"></result>
+        <result column="stuClass" property="stuClass"></result>
+        <result column="stuMajor" property="stuMajor"></result>
+        <result column="stuDept" property="stuDept"></result>
+        <result column="stuPass" property="stuPass"></result>
+        <result column="curId" property="curId"></result>
+    </resultMap>
+
+    <resultMap id="majorResult" type="com.hrms.bean.Student">
+        <result column="stuMajor" property="stuMajor"></result>
+    </resultMap>
+
+    <resultMap id="classResult" type="com.hrms.bean.Student">
+        <result column="stuClass" property="stuClass"></result>
+    </resultMap>
+
+
+    <select id="selectOneByStuId" parameterType="java.lang.String" resultType="com.hrms.bean.Student">
+        SELECT
+        <include refid="select_stu_fields"/>
+        FROM
+        <include refid="table_name"/>
+        WHERE
+        stuId = #{stuId}
+    </select>
+
+    <select id="selectStuByOffsetAndLimit" resultMap="stuResult">
+        SELECT
+        <include refid="select_stu_fields"></include>
+        FROM
+        <include refid="table_name"></include>
+        LIMIT #{offset}, #{limit}
+    </select>
+
+    <select id="getStuListVaTea" resultMap="stuResult1">
+        SELECT
+          s.stuId, stuName, stuClass, stuMajor, stuDept, stuPass, curId
+        FROM
+          student s,`group` g
+        WHERE
+          s.stuId =g.stuId
+        AND
+          g.curId = #{curId}
+    </select>
+
+    <select id="countStuVaCur" parameterType="String" resultType="int">
+        SELECT
+         COUNT(*)
+        FROM
+         `group`
+        WHERE
+          curId = #{curId}
+    </select>
+
+    <select id="getStuMajorList"  resultMap="majorResult">
+        SELECT
+        DISTINCT stuMajor
+        FROM
+        <include refid="table_name"></include>
+    </select>
+
+    <select id="getClassByMajor"  resultMap="classResult">
+        SELECT
+        DISTINCT stuClass
+        FROM
+        <include refid="table_name"></include>
+        WHERE
+        stuMajor= #{stuMajor}
+    </select>
+
+    <select id="selStuByMajorAndClass"  resultMap="stuResult">
+        SELECT
+        <include refid="select_stu_fields"/>
+        FROM
+        <include refid="table_name"></include>
+        WHERE
+        stuMajor= #{stuMajor}
+        AND
+        stuClass=#{stuClass}
+    </select>
+
+
+    <!--更新学生-->
+    <update id="updateStuById" parameterType="com.hrms.bean.Student">
+        UPDATE
+        <include refid="table_name"></include>
+        SET
+        stuName = #{student.stuName, jdbcType = VARCHAR},
+        stuClass = #{student.stuClass, jdbcType = VARCHAR},
+        stuMajor = #{student.stuMajor, jdbcType = VARCHAR},
+        stuDept = #{student.stuDept, jdbcType = VARCHAR},
+        stuPass = #{student.stuPass, jdbcType = VARCHAR}
+        WHERE
+        stuId = #{stuId}
+    </update>
+
+</mapper>

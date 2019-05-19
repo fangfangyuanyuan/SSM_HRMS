@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hrms.mapper.CurriculumMapper">
+    <sql id="table_name">
+         curriculum
+    </sql>
+    <sql id="select_cur_fields">
+        curId, couId, teaId, startTime, endTime, curYear, scoStart, scoEnd, sco2Count, sco3Count, sco3Count
+    </sql>
+
+    <sql id="select_cou_fields">
+        c1.couId, couName, couNature, couCredit, couIntroduce, couDept, curYear
+    </sql>
+
+    <resultMap id="couResult" type="com.hrms.bean.Curriculum">
+        <id column="couId" property="couId"></id>
+        <result column="couName" property="couName"></result>
+        <result column="couNature" property="couNature"></result>
+        <result column="couCredit" property="couCredit"></result>
+        <result column="couIntroduce" property="couIntroduce"></result>
+        <result column="couDept" property="couDept"></result>
+        <result column="curYear" property="curYear"></result>
+    </resultMap>
+
+    <resultMap id="CurResultByAdmin" type="com.hrms.bean.Curriculum">
+        <id column="curId" property="curId"></id>
+        <result column="couId" property="couId"></result>
+        <result column="teaId" property="teaId"></result>
+        <result column="curYear" property="curYear"></result>
+        <result column="startTime" property="startTime"></result>
+        <result column="endTime" property="endTime"></result>
+    </resultMap>
+
+    <resultMap id="TeaResultByAdmin" type="com.hrms.bean.Curriculum">
+        <id column="curId" property="curId"></id>
+        <result column="couId" property="couId"></result>
+        <result column="couName" property="couName"></result>
+        <result column="teaId" property="teaId"></result>
+        <result column="teaName" property="teaName"></result>
+        <result column="curYear" property="curYear"></result>
+        <result column="scoStart" property="scoStart"></result>
+        <result column="endStart" property="endStart"></result>
+        <result column="sco1Count" property="sco1Count"></result>
+        <result column="sco2Count" property="sco2Count"></result>
+        <result column="sco3Count" property="sco3Count"></result>
+        <result column="startTime" property="startTime"></result>
+        <result column="endTime" property="endTime"></result>
+    </resultMap>
+
+    <resultMap id="couResultByTea" type="com.hrms.bean.Curriculum">
+        <id column="couId" property="couId"></id>
+        <result column="couName" property="couName"></result>
+        <result column="couNature" property="couNature"></result>
+        <result column="couCredit" property="couCredit"></result>
+        <result column="couIntroduce" property="couIntroduce"></result>
+        <result column="couDept" property="couDept"></result>
+        <result column="curId" property="curId"></result>
+        <result column="curYear" property="curYear"></result>
+        <result column="startTime" property="startTime"></result>
+        <result column="endTime" property="endTime"></result>
+        <result column="scoStart" property="scoStart"></result>
+        <result column="scoEnd" property="scoEnd"></result>
+    </resultMap>
+
+
+    <resultMap id="curNameResult" type="com.hrms.bean.Curriculum">
+        <result column="couId" property="couId"></result>
+        <result column="couName" property="couName"></result>
+        <result column="curYear" property="curYear"></result>
+    </resultMap>
+
+
+    <resultMap id="couResultByStu" type="com.hrms.bean.Curriculum">
+        <id column="couId" property="couId"></id>
+        <result column="couName" property="couName"></result>
+        <result column="couNature" property="couNature"></result>
+        <result column="couCredit" property="couCredit"></result>
+        <result column="couIntroduce" property="couIntroduce"></result>
+        <result column="couDept" property="couDept"></result>
+        <result column="curId" property="curId"></result>
+        <result column="curYear" property="curYear"></result>
+        <result column="teaName" property="teaName"></result>
+        <result column="startTime" property="startTime"></result>
+        <result column="endTime" property="endTime"></result>
+    </resultMap>
+
+    <select id="selCurByCouAndTeaAndYear"  resultType="com.hrms.bean.Curriculum">
+        SELECT
+        <include refid="select_cur_fields"></include>
+        FROM
+        <include refid="table_name"></include>
+        WHERE
+        couId = #{couId}
+        AND
+        teaId = #{teaId}
+        AND
+        curYear = #{curYear}
+    </select>
+
+
+    <select id="selCurById"  parameterType="String" resultType="com.hrms.bean.Curriculum">
+        SELECT
+        curId, c1.couId, c1.teaId, curYear, startTime, endTime, couName,sco1Count,sco2Count,sco3Count, teaName, mould, scoStart, scoEnd, scoStatus
+        FROM
+        curriculum c1, course c2, teacher t1
+        WHERE
+        c1.teaId = t1.teaId
+        AND
+        c1.couId = c2.couId
+        AND
+        curId = #{curId}
+    </select>
+
+
+    <select id="getTeaGroListByAdmin"  resultMap="TeaResultByAdmin">
+        SELECT
+        curId, c1.couId couId,couName,c1.teaId teaId,teaName, curYear, scoStart, scoEnd, sco1Count, sco2Count, sco3Count, startTime, endTime
+        FROM
+        curriculum c1, course c2,teacher t
+        WHERE
+        c1.couId = c2.couId
+        AND
+        c1.teaId = t.teaId
+        AND
+        c1.couId = #{couId}
+        AND
+        curYear = #{curYear}
+        LIMIT #{offset}, #{limit}
+    </select>
+
+
+    <select id="getTeaListByCouAndYear"  resultMap="TeaResultByAdmin">
+        SELECT
+        curId, c1.couId couId,couName,c1.teaId teaId,teaName, curYear, scoStart, scoEnd, sco1Count, sco2Count, sco3Count, startTime, endTime
+        FROM
+        curriculum c1, course c2,teacher t
+        WHERE
+        c1.couId = c2.couId
+        AND
+        c1.teaId = t.teaId
+        AND
+        c1.couId = #{couId}
+        AND
+        curYear = #{curYear}
+    </select>
+
+
+    <select id="selCurByCouAndCurYear"  resultMap="CurResultByAdmin">
+        SELECT
+        <include refid="select_cur_fields"></include>
+        FROM
+        curriculum
+        WHERE
+        couId = #{couId}
+        AND
+        curYear = #{curYear}
+    </select>
+
+    <select id="selectCurNameByAdmin"  resultMap="curNameResult">
+        SELECT
+         distinct c1.couId couId,couName, curYear
+        FROM
+        curriculum c1, course c2,teacher t
+        WHERE
+        c1.couId = c2.couId
+        AND
+        c1.teaId = t.teaId
+    </select>
+
+    <!--查询某个教师所带课程的名字-->
+    <select id="selectCouNameByTea"  resultMap="couResultByTea">
+        SELECT
+        c1.couId couId, couName, couNature, couCredit, couIntroduce, couDept, curId, curYear, scoStart, scoEnd
+        FROM
+        course c1, curriculum c2
+        WHERE
+        c1.couId = c2.couId
+        AND
+        teaId = #{teaId}
+    </select>
+
+    <select id="countCousByTea" resultType="int">
+        SELECT
+        COUNT(*)
+        FROM
+        course c1, curriculum c2
+        WHERE
+        c1.couId = c2.couId
+        AND
+        teaId = #{teaId}
+    </select>
+
+    <!--查询某个教师所带课程-->
+    <select id="selectCouByTeaIdAndCurYear"  resultMap="couResultByTea">
+        SELECT
+        c1.couId couId, couName, couNature, couCredit, couIntroduce, couDept, curId, curYear, startTime, endTime, scoStart, scoEnd
+        FROM
+        course c1, curriculum c2
+        WHERE
+        c1.couId = c2.couId
+        AND
+        teaId = #{teaId}
+        LIMIT #{offset}, #{limit}
+    </select>
+
+    <!--查询某个学生的课程名-->
+    <select id="selectCouNameByStu"  resultMap="couResultByStu">
+        SELECT
+        c1.couId couId, couName, couNature, couCredit, couIntroduce, couDept, c2.curId curId, curYear, teaName
+        FROM
+        course c1, curriculum c2, `group` g, teacher t
+        WHERE
+        c1.couId = c2.couId
+        AND
+        g.curId = c2.curId
+        AND
+        c2.teaId = t.teaId
+        AND
+        stuId = #{stuId}
+    </select>
+
+    <select id="countCousByStu" resultType="int">
+        SELECT
+        COUNT(*)
+        FROM
+        `group` g
+        WHERE
+        stuId = #{stuId}
+    </select>
+
+    <!--查询某个学生的课程-->
+    <select id="selectCouOfStu"  resultMap="couResultByStu">
+        SELECT
+        c1.couId couId, couName, couNature, couCredit, couIntroduce, couDept, c2.curId curId, curYear, teaName,startTime,endTime
+        FROM
+        course c1, curriculum c2, `group` g, teacher t
+        WHERE
+        c1.couId = c2.couId
+        AND
+        g.curId = c2.curId
+        AND
+        c2.teaId = t.teaId
+        AND
+        stuId = #{stuId}
+        LIMIT #{offset}, #{limit}
+    </select>
+
+    <update id="UpdateCur">
+        UPDATE
+        <include refid="table_name"></include>
+        SET
+        startTime = #{curriculum.startTime},endTime = #{curriculum.endTime},mould =#{curriculum.mould},
+        scoStart = #{curriculum.scoStart},scoEnd = #{curriculum.scoEnd}, sco1Count = #{curriculum.sco1Count},
+        sco2Count = #{curriculum.sco2Count},sco3Count = #{curriculum.sco3Count},scoStatus = #{curriculum.scoStatus}
+        WHERE
+        curId = #{curId}
+    </update>
+
+
+    <update id="UpdateScoTime">
+        UPDATE
+        <include refid="table_name"></include>
+        SET
+        scoStart = #{scoStart},scoEnd = #{scoEnd}
+        WHERE
+        couId = #{couId}
+        AND
+        curYear =#{curYear}
+    </update>
+
+</mapper>

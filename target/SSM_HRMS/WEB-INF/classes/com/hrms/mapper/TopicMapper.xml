@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hrms.mapper.TopicMapper">
+    <sql id="table_name">
+        topic
+    </sql>
+    <sql id="select_top_fields">
+        topId, curId, topName, topNature, topIntroduce, topStatus, topGiver
+    </sql>
+    <resultMap id="topResult" type="com.hrms.bean.Topic">
+        <id column="topId" property="topId"></id>
+        <result column="curId" property="curId"></result>
+        <result column="topName" property="topName"></result>
+        <result column="topNature" property="topNature"></result>
+        <result column="topIntroduce" property="topIntroduce"></result>
+    </resultMap>
+    <resultMap id="topCheckResult" type="com.hrms.bean.Topic">
+        <id column="topId" property="topId"></id>
+        <result column="topName" property="topName"></result>
+        <result column="topNature" property="topNature"></result>
+        <result column="topIntroduce" property="topIntroduce"></result>
+        <result column="stuName" property="stuName"></result>
+    </resultMap>
+    <resultMap id="reviewResultByStu" type="com.hrms.bean.Group">
+        <id column="topId" property="topId"></id>
+        <result column="couName" property="couName"></result>
+        <result column="curYear" property="curYear"></result>
+        <result column="teaName" property="teaName"></result>
+        <result column="topName" property="topName"></result>
+    </resultMap>
+
+
+    <select id="getTopsListByCur" resultMap="topResult">
+    SELECT
+      <include refid="select_top_fields"></include>
+    FROM
+        <include refid="table_name"></include>
+    WHERE
+        curId = #{curId}
+    AND
+        topGiver = "教师"
+    </select>
+
+    <select id="selectOneByTopId" resultType="com.hrms.bean.Topic">
+        SELECT
+        topId, c1.curId, topName, topNature,topIntroduce,topStatus,topGiver, c1.couId, c1.teaId, curYear,startTime, endTime, couName, teaName
+        FROM
+        teacher t1,topic t2,curriculum c1, course c2
+        WHERE
+        c1.curId = t2.curId
+        AND
+        c1.teaId = t1.teaId
+        AND
+        c1.couId = c2.couId
+        AND
+        topId = #{topId}
+    </select>
+
+    <!--教师给定题目-->
+    <select id="getTopsList1ByCurOfTea" resultMap="topResult">
+        SELECT
+        <include refid="select_top_fields"></include>
+        FROM
+        <include refid="table_name"></include>
+        WHERE
+        curId = #{curId}
+        AND
+        topGiver = '教师'
+    </select>
+
+    <!--学生自拟成功题目-->
+    <select id="getTopsList2ByCurOfTea" resultMap="topResult">
+        SELECT
+        <include refid="select_top_fields"></include>
+        FROM
+        <include refid="table_name"></include>
+        WHERE
+        curId = #{curId}
+        AND
+        topStatus = 2
+        AND
+        topGiver != '教师'
+    </select>
+
+    <select id="selTopByCurId" resultMap="topResult">
+        SELECT
+        <include refid="select_top_fields"></include>
+        FROM
+        <include refid="table_name"></include>
+        WHERE
+        curId = #{curId}
+        AND
+        topGiver = "教师"
+    </select>
+
+    <select id="getTopCheckList" resultMap="topCheckResult">
+        SELECT
+        topId, topName, topNature, topIntroduce, stuName
+        FROM
+        topic t left JOIN student s on t.topGiver = s.stuId
+        WHERE
+        curId = #{curId}
+        AND
+        topStatus = 0
+        AND
+        t.topGiver != '教师'
+    </select>
+
+    <select id="selTopByCurAndTopName"  parameterType="com.hrms.bean.Topic" resultType="com.hrms.bean.Topic">
+        SELECT
+        <include refid="select_top_fields"></include>
+        FROM
+        <include refid="table_name"></include>
+        WHERE
+        curId = #{topic.curId}
+        AND
+        topName = #{topic.topName}
+    </select>
+
+    <select id="getTopCountByCur"  parameterType="String" resultType="int">
+        SELECT
+          COUNT(*)
+        FROM
+          <include refid="table_name"></include>
+        WHERE
+          curId = #{curId}
+        AND
+          topGiver = '教师'
+    </select>
+
+
+
+    <select id="getTopUnReview" resultMap="reviewResultByStu">
+        SELECT
+        topId, couName, curYear, teaName, topName
+        FROM
+        teacher t1,topic t2,curriculum c1, course c2
+        WHERE
+        c1.curId = t2.curId
+        AND
+        c1.teaId = t1.teaId
+        AND
+        c1.couId = c2.couId
+        AND
+        t2.topStatus = 0
+        AND
+        t2.topGiver =#{stuId}
+    </select>
+
+    <select id="getTopFail" resultMap="reviewResultByStu">
+        SELECT
+        topId, couName, curYear, teaName, topName
+        FROM
+        teacher t1,topic t2,curriculum c1, course c2
+        WHERE
+        c1.curId = t2.curId
+        AND
+        c1.teaId = t1.teaId
+        AND
+        c1.couId = c2.couId
+        AND
+        t2.topStatus = -1
+        AND
+        t2.topGiver =#{stuId}
+    </select>
+
+
+
+    <!--updateTopById-->
+    <update id="updateTopById" parameterType="com.hrms.bean.Topic">
+        UPDATE
+        <include refid="table_name"></include>
+        SET
+        topName = #{topic.topName, jdbcType = VARCHAR},
+        topNature = #{topic.topNature, jdbcType = VARCHAR},
+        topIntroduce = #{topic.topIntroduce, jdbcType = VARCHAR},
+        topStatus = #{topic.topStatus, jdbcType = VARCHAR}
+        WHERE
+        topId = #{topId}
+    </update>
+</mapper>

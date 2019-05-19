@@ -1,0 +1,25 @@
+<HTML>
+<head>
+    <script type="text/javascript" src="script/jquery-1.6.2.min.js"></script>
+    <script type='text/javascript'>
+        function selectFile(){
+            //触发 文件选择的click事件
+            $("#file").trigger("click");
+
+            //其他code如 alert($("#file").attr("value"))
+        }
+
+        /* 获取 文件的路径 ，用于测试*/
+        function getFilePath(){
+            alert($("#file").attr("value"));
+        }
+    </script>
+</head>
+<body>
+<!-- 给这个input 设置样式隐藏，切忌不可用display控制隐藏,可能不能跨浏览器 -->
+<input type="file" id="file" onchange="getFilePath()"
+       style="filter:alpha(opacity=0);opacity:0;width: 0;height: 0;"/>
+<button onclick="selectFile();">select file</button>
+<button onclick="getFilePath()">get FilePath</button>
+</body>
+</html>
